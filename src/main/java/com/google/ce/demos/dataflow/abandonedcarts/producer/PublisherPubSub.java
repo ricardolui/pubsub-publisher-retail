@@ -14,13 +14,23 @@ import org.joda.time.DateTimeZone;
 
 import java.util.*;
 
+/**
+ * Maven command to run
+ * mvn compile exec:java \
+ -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
+ -Dexec.args="--project=YOUR-PROJECT \
+ --topic=YOUR_TOPIC \
+ --messagesPerSecond=NUM_MSG_PER_SECOND \
+ --simulateAutoscaling=true \
+ *
+ */
 public class PublisherPubSub {
 
     /**
      * Replace this variables with your own.
      */
-    public static String PROJECT_NAME="PROJECTID";
-    public static String TOPIC = "TOPIC";
+    public static String PROJECT_NAME="gricardo-brasil3";
+    public static String TOPIC = "b2w";
 
 
     public static void publishAbandonedCartMessage(long numberOfMessages) {
@@ -145,25 +155,37 @@ public class PublisherPubSub {
     public static void main(String args[]) {
 
 
-//        System.out.println(Calendar.getInstance(TimeZone.));
+        /**
+         * mvn compile exec:java \
+         -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
+         -Dexec.args="--project=gricardo-brasil3 \
+         --topic=b2w \
+         --messagesPerSecond=10 \
+         --simulateAutoscaling=false"
+         */
+        System.out.println("Entered Program to Publish PubSub Messages to your Topic");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        int customers = 0;
-        while(true)
-        {
-            try
-            {
-                Thread.sleep(1000);
-                publishMessage(10, customers);
-                customers++;
-
-            }
-            catch(Exception e)
-
-            {
-
-            }
-
+        for(int i = 0; i < args.length; i++) {
+            System.out.println(args[i]);
         }
+
+//        int customers = 0;
+//        while(true)
+//        {
+//            try
+//            {
+//                Thread.sleep(1000);
+//                publishMessage(100, customers);
+//                customers++;
+//
+//            }
+//            catch(Exception e)
+//
+//            {
+//
+//            }
+//
+//        }
 
 
 
