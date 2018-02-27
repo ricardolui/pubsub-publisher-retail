@@ -5,6 +5,9 @@ import com.google.api.core.ApiFutures;
 import com.google.ce.demos.dataflow.abandonedcarts.common.AbonandonedCartsVariables;
 import com.google.ce.demos.dataflow.abandonedcarts.common.PageView;
 import com.google.cloud.pubsub.v1.Publisher;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.gson.Gson;
 import com.google.protobuf.ByteString;
 import com.google.pubsub.v1.PubsubMessage;
@@ -13,6 +16,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * Maven command to run
@@ -26,11 +31,37 @@ import java.util.*;
  */
 public class PublisherPubSub {
 
-    /**
-     * Replace this variables with your own.
-     */
-    public static String PROJECT_NAME="gricardo-brasil3";
-    public static String TOPIC = "b2w";
+
+    public static ListMultimap<String, String> parseCommandLine(
+            String[] args, boolean strictParsing) {
+        ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
+        for (String arg : args) {
+            if (Strings.isNullOrEmpty(arg)) {
+                continue;
+            }
+            try {
+                checkArgument(arg.startsWith("--"),
+                        "Argument '%s' does not begin with '--'", arg);
+                int index = arg.indexOf("=");
+                // Make sure that '=' isn't the first character after '--' or the last character
+                checkArgument(index != 2,
+                        "Argument '%s' starts with '--=', empty argument name not allowed", arg);
+                if (index > 0) {
+                    builder.put(arg.substring(2, index), arg.substring(index + 1, arg.length()));
+                } else {
+                    builder.put(arg.substring(2), "true");
+                }
+            } catch (IllegalArgumentException e) {
+                if (strictParsing) {
+                    throw e;
+                } else {
+                    System.out.println(String.format("Strict parsing is disabled, ignoring option '{}' because {}",
+                            arg, e.getMessage()));
+                }
+            }
+        }
+        return builder.build();
+    }
 
 
     public static void publishAbandonedCartMessage(long numberOfMessages) {
@@ -39,9 +70,9 @@ public class PublisherPubSub {
     }
 
 
-    public static void publishMessage(int numberOfMessages, int customerIdInit) {
+    public static void publishMessage(int numberOfMessages, int customerIdInit, String myTopic, String myProject) {
 
-        TopicName topicName = TopicName.of(PROJECT_NAME, TOPIC);
+        TopicName topicName = TopicName.of(myProject, myTopic);
         Publisher publisher = null;
         List<ApiFuture<String>> messageIdFutures = new ArrayList<ApiFuture<String>>();
         int abandoned = 0;
@@ -165,27 +196,45 @@ public class PublisherPubSub {
          */
         System.out.println("Entered Program to Publish PubSub Messages to your Topic");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-        for(int i = 0; i < args.length; i++) {
-            System.out.println(args[i]);
-        }
 
-//        int customers = 0;
-//        while(true)
-//        {
-//            try
-//            {
-//                Thread.sleep(1000);
-//                publishMessage(100, customers);
-//                customers++;
-//
-//            }
-//            catch(Exception e)
-//
-//            {
-//
-//            }
-//
+        ListMultimap<String, String> multiMap = PublisherPubSub.parseCommandLine(args, false);
+
+//        for(int i = 0; i < args.length; i++) {
+//            System.out.println(args[i]);
 //        }
+
+        List<String> topic = multiMap.get("topic");
+        String myTopic = topic.get(0);
+
+        List<String> project = multiMap.get("project");
+        String myProject = project.get(0);
+
+
+        List<String> mps = multiMap.get("messagesPerSecond");
+        int messagesPerSecond = mps!=null? mps.size()>0? Integer.parseInt(mps.get(0)):100:100;
+
+
+        List<String> simAutoscaling = multiMap.get("simulateAutoscaling");
+        boolean simulateAutoscaling = simAutoscaling!=null? Boolean.parseBoolean(simAutoscaling.get(0)): false;
+
+
+
+        int customers = 0;
+        while(true)
+        {
+            try
+            {
+                Thread.sleep(1000);
+                publishMessage(messagesPerSecond, customers, myTopic, myProject);
+                customers++;
+            }
+            catch(Exception e)
+
+            {
+
+            }
+
+        }
 
 
 

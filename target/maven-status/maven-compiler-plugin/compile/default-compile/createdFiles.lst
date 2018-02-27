@@ -1,0 +1,4 @@
+com/google/ce/demos/dataflow/abandonedcarts/common/AbonandonedCartsVariables.class
+com/google/ce/demos/dataflow/abandonedcarts/common/PageView.class
+com/google/ce/demos/dataflow/abandonedcarts/producer/PublisherPubSub.class
+com/google/ce/demos/dataflow/abandonedcarts/bq/BqInsert.class
