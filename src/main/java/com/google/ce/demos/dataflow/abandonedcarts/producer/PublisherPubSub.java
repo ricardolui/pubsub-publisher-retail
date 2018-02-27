@@ -150,7 +150,7 @@ public class PublisherPubSub {
 
             }
 
-//            System.out.println(String.format("Final Status: Abandoned: %d, Purchased: %d, Other: %d -- Total Messages: %d", abandoned, purchased, other, totalMessages).toString());
+            System.out.println(String.format("Final Status: Abandoned: %d, Purchased: %d, Other: %d -- Total Messages: %d", abandoned, purchased, other, totalMessages).toString());
         }
 
     }
