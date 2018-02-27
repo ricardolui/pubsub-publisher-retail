@@ -189,8 +189,8 @@ public class PublisherPubSub {
         /**
          * mvn compile exec:java \
          -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
-         -Dexec.args="--project=gricardo-brasil3 \
-         --topic=b2w \
+         -Dexec.args="--project=my-project \
+         --topic=my-topic \
          --messagesPerSecond=10 \
          --simulateAutoscaling=false"
          */
