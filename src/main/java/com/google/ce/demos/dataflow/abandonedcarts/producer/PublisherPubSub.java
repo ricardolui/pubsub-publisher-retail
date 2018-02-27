@@ -127,7 +127,6 @@ public class PublisherPubSub {
                         totalMessages+=2;
                     }
                 }
-
             }
 
         } catch (Exception e) {
