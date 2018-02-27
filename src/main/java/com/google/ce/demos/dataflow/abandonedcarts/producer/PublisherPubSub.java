@@ -16,20 +16,30 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.checkArgument;
-
-/**
- * Maven command to run
- * mvn compile exec:java \
- -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
- -Dexec.args="--project=YOUR-PROJECT \
- --topic=YOUR_TOPIC \
- --messagesPerSecond=NUM_MSG_PER_SECOND \
- --simulateAutoscaling=true \
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 public class PublisherPubSub {
+
+    private final static Logger logger = Logger.getLogger(PublisherPubSub.class.getName());
 
 
     public static ListMultimap<String, String> parseCommandLine(
@@ -55,7 +65,7 @@ public class PublisherPubSub {
                 if (strictParsing) {
                     throw e;
                 } else {
-                    System.out.println(String.format("Strict parsing is disabled, ignoring option '{}' because {}",
+                    logger.log(Level.INFO, String.format("Strict parsing is disabled, ignoring option '{}' because {}",
                             arg, e.getMessage()));
                 }
             }
@@ -129,7 +139,7 @@ public class PublisherPubSub {
                 List<String> messageIds = ApiFutures.allAsList(messageIdFutures).get();
 
                 for (String messageId : messageIds) {
-                    System.out.println("published with message ID: " + messageId);
+                    logger.log(Level.INFO, "published with message ID: " + messageId);
                 }
 
                 if (publisher != null) {
@@ -140,7 +150,7 @@ public class PublisherPubSub {
 
             }
 
-            System.out.println(String.format("Final Status: Abandoned: %d, Purchased: %d, Other: %d -- Total Messages: %d", abandoned, purchased, other, totalMessages).toString());
+//            System.out.println(String.format("Final Status: Abandoned: %d, Purchased: %d, Other: %d -- Total Messages: %d", abandoned, purchased, other, totalMessages).toString());
         }
 
     }
@@ -160,7 +170,7 @@ public class PublisherPubSub {
             }
         }
         String jsonString = new Gson().toJson(pageView);
-        System.out.println(jsonString);
+//        System.out.println(jsonString);
         ByteString data = ByteString.copyFromUtf8(jsonString);
         PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
         // Once published, returns a server-assigned message id (unique within the topic)
@@ -186,15 +196,7 @@ public class PublisherPubSub {
     public static void main(String args[]) {
 
 
-        /**
-         * mvn compile exec:java \
-         -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
-         -Dexec.args="--project=my-project \
-         --topic=my-topic \
-         --messagesPerSecond=10 \
-         --simulateAutoscaling=false"
-         */
-        System.out.println("Entered Program to Publish PubSub Messages to your Topic");
+        System.out.println("Entered Application to Publish PubSub Messages to your Topic");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
 
         ListMultimap<String, String> multiMap = PublisherPubSub.parseCommandLine(args, false);
@@ -214,9 +216,9 @@ public class PublisherPubSub {
         int messagesPerSecond = mps!=null? mps.size()>0? Integer.parseInt(mps.get(0)):100:100;
 
 
+        //TODO: Implement autoscaling
         List<String> simAutoscaling = multiMap.get("simulateAutoscaling");
         boolean simulateAutoscaling = simAutoscaling!=null? Boolean.parseBoolean(simAutoscaling.get(0)): false;
-
 
 
         int customers = 0;
@@ -224,7 +226,7 @@ public class PublisherPubSub {
         {
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(250);
                 publishMessage(messagesPerSecond, customers, myTopic, myProject);
                 customers++;
             }
@@ -235,8 +237,6 @@ public class PublisherPubSub {
             }
 
         }
-
-
 
     }
 
