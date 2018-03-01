@@ -25,7 +25,7 @@ This is a pubsub publisher for retail usecase on bigdata.
 
 ### Google Cloud
 
-1.  Go to https://cloud.google.com/console.
+1.  Go to https://cloud.google.com/console.****
 1.  Enable billing and create a project.
 1.  Enable Google PubSub API
 
@@ -49,3 +49,9 @@ mvn compile exec:java \
 This project is licensed under the MIT License
 
 
+mvn compile exec:java \
+ -Dexec.mainClass=com.google.ce.demos.dataflow.abandonedcarts.producer.PublisherPubSub \
+ -Dexec.args="--project=gricardo-brasil3 \
+              --topic=retailer-new-topic \
+	      --messagesPerSecond=10 \
+	      --simulateAutoscaling=false"
