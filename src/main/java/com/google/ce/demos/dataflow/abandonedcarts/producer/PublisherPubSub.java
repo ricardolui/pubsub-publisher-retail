@@ -270,10 +270,10 @@ public class PublisherPubSub {
         List<String> mps = multiMap.get("messagesPerSecond");
         int messagesPerSecond = mps != null ? mps.size() > 0 ? Integer.parseInt(mps.get(0)) : 1000 : 1000;
 
-        //autoincremented counter
-        long customers = retrieveCurrentCustomerId(true) - 1;
         while (true) {
+
             try {
+                long customers = retrieveCurrentCustomerId(true) - 1;
                 Thread.sleep(500);
                 publishMessage(messagesPerSecond, customers, myTopic, myProject);
             } catch (Exception e)
